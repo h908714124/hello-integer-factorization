@@ -18,4 +18,10 @@ class SieveTest {
         }
         assertEquals(25, sieve.length);
     }
+
+    @Test
+    void bla() {
+        int[] ints = Sieve.create((Integer.MAX_VALUE - 10) / 2);
+        System.out.println(ints.length);
+    }
 }
