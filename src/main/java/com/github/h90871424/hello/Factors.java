@@ -39,9 +39,13 @@ class Factors {
     }
 
     Optional<BigInteger> getProblem(List<BigInteger> factors) {
-        if (factors.get(factors.size() - 1).compareTo(maxPrime) <= 0) {
+        BigInteger problem = factors.get(factors.size() - 1);
+        if (problem.compareTo(maxPrime) <= 0) {
             return Optional.empty();
         }
-        return Optional.of(factors.get(factors.size() - 1));
+        if (problem.isProbablePrime(20)) {
+            return Optional.empty();
+        }
+        return Optional.of(problem);
     }
 }

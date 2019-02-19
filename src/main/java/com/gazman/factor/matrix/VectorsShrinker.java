@@ -6,6 +6,7 @@ import com.gazman.factor.VectorData;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by Ilya Gazman on 2/15/2016.
@@ -13,19 +14,18 @@ import java.util.LinkedList;
 public class VectorsShrinker {
 
 
-    private BigInteger N;
-    private BigInteger root;
+    private final BigInteger N;
+    private final BigInteger root;
     private int bigPrimesIndex;
 
-    public void init(BigInteger root, int biggestPrimeIndex, BigInteger N) {
+    public VectorsShrinker(BigInteger root, int bigPrimesIndex, BigInteger N) {
         this.root = root;
-        this.bigPrimesIndex = biggestPrimeIndex;
+        this.bigPrimesIndex = bigPrimesIndex;
         this.N = N;
     }
 
-    @SuppressWarnings("unchecked")
-    public ArrayList<VectorData> shrink(ArrayList<VectorData> bSmoothVectors, BigPrimesList bigPrimesList) {
-        bSmoothVectors = (ArrayList<VectorData>) bSmoothVectors.clone();
+    public List<VectorData> shrink(List<VectorData> bSmoothVectors, BigPrimesList bigPrimesList) {
+        bSmoothVectors = new ArrayList<>(bSmoothVectors);
         ArrayList<LinkedList<VectorData>> bigPrimes = bigPrimesList.getBigPrimes();
 
 

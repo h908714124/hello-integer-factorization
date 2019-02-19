@@ -9,6 +9,7 @@ import com.gazman.math.SqrRoot;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -27,15 +28,13 @@ public class QuadraticThieve extends Logger {
     private final int sieveVectorBound;
     private final BigInteger[] primeBase = new BigInteger[B_SMOOTH];
     private final int step;
-    private final ArrayList<VectorData> bSmoothVectors = new ArrayList<>();
+    private final List<VectorData> bSmoothVectors = new ArrayList<>();
     private final BigInteger N;
     private final BigInteger root;
     private int bSmoothFound;
     private final BigPrimesList bigPrimesList = new BigPrimesList();
-    private final VectorsShrinker vectorsShrinker = new VectorsShrinker();
+    private final VectorsShrinker vectorsShrinker;
     private final double double2Root;
-    //    private final int threadCount = Runtime.getRuntime().availableProcessors(); not working on mac
-    private final int threadCount = 2;
     private final AtomicInteger speedCounter = new AtomicInteger(0);
     private final AtomicInteger speed = new AtomicInteger(0);
 
@@ -44,31 +43,23 @@ public class QuadraticThieve extends Logger {
         root = SqrRoot.bigIntSqRootCeil(input);
         double2Root = root.add(root).doubleValue();
 
-        log("Building Prime Base");
         buildPrimeBase();
-        vectorsShrinker.init(root, primeBase.length, N);
+        vectorsShrinker = new VectorsShrinker(root, primeBase.length, N);
         BigInteger highestPrime = primeBase[primeBase.length - 1];
         sieveVectorBound = highestPrime.intValue();
         minimumBigPrimeLog = Math.log(highestPrime.pow(2).doubleValue());
         step = sieveVectorBound;
-        log("Biggest prime is", highestPrime);
-        log();
-
-        log("Working on", threadCount, "threads");
-        log("Start searching");
     }
 
     public BigInteger start() {
-        return execute(0);
+        return execute();
     }
 
-    private BigInteger execute(int threadId) {
+    private BigInteger execute() {
         long basePosition = 0;
         while (true) {
-            long position = basePosition + threadId * MAX_LOOPS * step;
-            log(threadId, "Building wheels");
+            long position = basePosition;
             Wheel[] localWheels = initSieveWheels(position);
-            log(threadId, "Started");
             for (int loops = 0; loops < MAX_LOOPS; loops++) {
                 double baseLog = calculateBaseLog(position);
                 position += step;
@@ -80,37 +71,13 @@ public class QuadraticThieve extends Logger {
                 }
 
                 if (sieve && isReadyToBeSolved()) {
-                    log(threadId, "Getting ready to solve");
-                    if (threadId == 0) {
-                        try {
-                            Thread.sleep(10);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        synchronized (QuadraticThieve.this) {
-                            try {
-                                log(threadId, "Waiting for solution");
-                                QuadraticThieve.this.wait();
-                                continue;
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                    logProcesses();
                     Optional<BigInteger> solution = tryToSolve();
                     if (solution.isPresent()) {
                         return solution.get();
-                    } else {
-                        System.exit(1);
-                        synchronized (QuadraticThieve.this) {
-                            QuadraticThieve.this.notifyAll();
-                        }
                     }
                 }
             }
-            basePosition += step * MAX_LOOPS * threadCount;
+            basePosition += step * MAX_LOOPS;
         }
     }
 
@@ -119,7 +86,6 @@ public class QuadraticThieve extends Logger {
     }
 
     private double calculateBaseLog(double position) {
-//        double target = root.add(BigInteger.valueOf(position)).pow(2).subtract(N).doubleValue();
         return Math.log(position * (position + double2Root));
 
     }
@@ -173,22 +139,20 @@ public class QuadraticThieve extends Logger {
 
                 boolean bigPrime = reminderLog > MINIMUM_LOG;
 
-                synchronized (this) {
-                    if (vectors[index] == null) {
-                        VectorData vectorData = new VectorData(new BitSet(i), index + destination - sieveVectorBound);
-                        vectors[index] = vectorData;
+                if (vectors[index] == null) {
+                    VectorData vectorData = new VectorData(new BitSet(i), index + destination - sieveVectorBound);
+                    vectors[index] = vectorData;
 
-                        if (bigPrime) {
-                            long prime = Math.round(Math.pow(Math.E, reminderLog));
-                            bigPrimesList.add(prime, vectorData);
-                        } else {
-                            bSmoothVectors.add(vectorData);
-                            bSmoothFound++;
-                        }
+                    if (bigPrime) {
+                        long prime = Math.round(Math.pow(Math.E, reminderLog));
+                        bigPrimesList.add(prime, vectorData);
+                    } else {
+                        bSmoothVectors.add(vectorData);
+                        bSmoothFound++;
                     }
-                    vectorsFound = true;
-                    vectors[index].vector.set(i);
                 }
+                vectorsFound = true;
+                vectors[index].vector.set(i);
             }
         }
 
@@ -198,13 +162,13 @@ public class QuadraticThieve extends Logger {
     private Optional<BigInteger> tryToSolve() {
         log("Building matrix");
 
-        ArrayList<VectorData> vectorDatas = vectorsShrinker.shrink(bSmoothVectors, bigPrimesList);
+        List<VectorData> vectorDatas = vectorsShrinker.shrink(bSmoothVectors, bigPrimesList);
 
         BitMatrix bitMatrix = new BitMatrix();
-        ArrayList<ArrayList<VectorData>> solutions = bitMatrix.solve(vectorDatas);
+        List<List<VectorData>> solutions = bitMatrix.solve(vectorDatas);
 
         for (int i = 0; i < solutions.size(); i++) {
-            ArrayList<VectorData> solution = solutions.get(i);
+            List<VectorData> solution = solutions.get(i);
             log("Testing solution", (i + 1) + "/" + solutions.size());
             Optional<BigInteger> gcd = testSolution(solution);
             if (gcd.isPresent()) {
@@ -220,7 +184,7 @@ public class QuadraticThieve extends Logger {
         return bSmoothVectors.size() + bigPrimesList.getPrimesFound() >= B_SMOOTH;
     }
 
-    private Optional<BigInteger> testSolution(ArrayList<VectorData> solutionVector) {
+    private Optional<BigInteger> testSolution(List<VectorData> solutionVector) {
         BigInteger y = one;
         BigInteger x = one;
 

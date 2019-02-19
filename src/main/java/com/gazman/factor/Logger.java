@@ -12,7 +12,7 @@ public class Logger {
     private static final long startingTime = System.currentTimeMillis();
     final BigInteger one = BigInteger.ONE;
 
-    private final boolean logsEnabled = true;
+    private final boolean logsEnabled = false;
 
 
     private final String emptyChar = (new char[1])[0] + "";

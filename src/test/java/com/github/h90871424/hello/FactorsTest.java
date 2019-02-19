@@ -5,7 +5,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -26,10 +28,31 @@ class FactorsTest {
         BigInteger start = NINE;
         for (int i = 1; i < 100; i++) {
             List<BigInteger> factors = f.factors(start);
-            System.out.printf("%d -> %s%n", start, factors);
+            factors = solveRemaining(f, factors);
             assertEquals(start, product(factors));
+            for (BigInteger factor : factors) {
+                Assertions.assertTrue(factor.isProbablePrime(10));
+            }
+            System.out.printf("%d -> %s%n", start, factors);
             start = start.add(NINE.multiply(BigInteger.TEN.pow(i)));
         }
+    }
+
+    private List<BigInteger> solveRemaining(Factors f, List<BigInteger> factors) {
+        Optional<BigInteger> opt = f.getProblem(factors);
+        if (!opt.isPresent()) {
+            return factors;
+        }
+        BigInteger problem = opt.get();
+        BigInteger solution = new QuadraticThieve(problem).start();
+        List<BigInteger> result = new ArrayList<>();
+        for (int i = 0; i < factors.size() - 1; i++) {
+            BigInteger factor = factors.get(i);
+            result.add(factor);
+        }
+        result.add(solution);
+        result.add(problem.divide(solution));
+        return result;
     }
 
     @Test

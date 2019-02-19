@@ -6,17 +6,18 @@ import com.gazman.factor.VectorData;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by Ilya Gazman on 2/8/2016.
  */
 public class BitMatrix extends Logger {
 
-    private BitSet rows[];
-    private BitSet solutionRows[];
-    private ArrayList<VectorData> vectorDatas;
+    private BitSet[] rows;
+    private BitSet[] solutionRows;
+    private List<VectorData> vectorDatas;
 
-    public ArrayList<ArrayList<VectorData>> solve(ArrayList<VectorData> vectorDatas) {
+    public List<List<VectorData>> solve(List<VectorData> vectorDatas) {
         log("Preparing to solve...");
 
         this.vectorDatas = vectorDatas;
@@ -56,7 +57,7 @@ public class BitMatrix extends Logger {
 
         log("Extracting solutions");
 
-        ArrayList<ArrayList<VectorData>> solutions = new ArrayList<>();
+        List<List<VectorData>> solutions = new ArrayList<>();
         for (int i = 0; i < rows.length; i++) {
             if (rows[i].isEmpty()) {
                 solutions.add(createSolution(i));
@@ -68,8 +69,8 @@ public class BitMatrix extends Logger {
         return solutions;
     }
 
-    private ArrayList<VectorData> createSolution(int row) {
-        ArrayList<VectorData> solution = new ArrayList<>();
+    private List<VectorData> createSolution(int row) {
+        List<VectorData> solution = new ArrayList<>();
         for (int column = 0; column < rows.length; column++) {
             if (solutionRows[row].get(column)) {
                 solution.add(vectorDatas.get(column));
