@@ -48,7 +48,9 @@ class FactorsTest {
     void testBiggie() {
         BigInteger problem = new BigInteger("341233306557836423189042926585457900151074303303755301");
         BigInteger solution = new QuadraticThieve(problem).start();
-        Assertions.assertEquals(new BigInteger("2574219561990406384132201"), solution);
+        Assertions.assertNotEquals(problem, solution);
+        Assertions.assertNotEquals(BigInteger.ONE, solution);
+        Assertions.assertEquals(BigInteger.ZERO, problem.mod(solution));
     }
 
     private static BigInteger product(List<BigInteger> factors) {

@@ -2,18 +2,22 @@ package com.gazman.math;
 
 import java.math.BigInteger;
 
+import static java.math.BigInteger.ONE;
+
 /**
  * Created by Ilya Gazman on 2/1/2016.
  */
 public class MathUtils {
+
+    private static final BigInteger TWO = BigInteger.valueOf(2);
+
     public static boolean isRootInQuadraticResidues(BigInteger n, BigInteger p) {
-        BigInteger tow = BigInteger.valueOf(2);
         BigInteger x = n.mod(p);
-        if (p.equals(tow)) {
-            return x.mod(tow).equals(BigInteger.ONE);
+        if (p.equals(TWO)) {
+            return x.mod(TWO).equals(ONE);
         }
-        BigInteger exponent = p.subtract(BigInteger.ONE).divide(tow);
-        return x.modPow(exponent, p).equals(BigInteger.ONE);
+        BigInteger exponent = p.subtract(ONE).divide(TWO);
+        return x.modPow(exponent, p).equals(ONE);
     }
 
     /**

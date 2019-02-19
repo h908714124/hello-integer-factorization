@@ -40,7 +40,6 @@ public class QuadraticThieve extends Logger {
     private final AtomicInteger speed = new AtomicInteger(0);
 
     public QuadraticThieve(BigInteger input) {
-        log("Factoring started");
         N = input;
         root = SqrRoot.bigIntSqRootCeil(input);
         double2Root = root.add(root).doubleValue();
