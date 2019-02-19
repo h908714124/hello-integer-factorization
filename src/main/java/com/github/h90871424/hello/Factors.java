@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 class Factors {
@@ -21,10 +22,10 @@ class Factors {
     }
 
     List<BigInteger> factors(BigInteger n) {
-        List<BigInteger> result = new ArrayList<>();
+        List<BigInteger> factors = new ArrayList<>();
         for (BigInteger p : primes) {
             while (n.remainder(p).equals(BigInteger.ZERO)) {
-                result.add(p);
+                factors.add(p);
                 n = n.divide(p);
             }
             if (n.compareTo(p) < 0) {
@@ -32,12 +33,15 @@ class Factors {
             }
         }
         if (n.compareTo(maxPrime) > 0) {
-            if (n.isProbablePrime(14)) {
-                result.add(n);
-            } else {
-                throw new IllegalStateException("Boese: " + n);
-            }
+            factors.add(n);
         }
-        return result;
+        return factors;
+    }
+
+    Optional<BigInteger> getProblem(List<BigInteger> factors) {
+        if (factors.get(factors.size() - 1).compareTo(maxPrime) <= 0) {
+            return Optional.empty();
+        }
+        return Optional.of(factors.get(factors.size() - 1));
     }
 }
