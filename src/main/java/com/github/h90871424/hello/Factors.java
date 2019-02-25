@@ -2,18 +2,14 @@ package com.github.h90871424.hello;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 class Factors {
 
     private final int LIMIT = (Integer.MAX_VALUE - 100) / 5;
 
-    private final List<BigInteger> primes = Arrays.stream(Sieve.create(LIMIT))
-            .mapToObj(BigInteger::valueOf)
-            .collect(Collectors.toList());
+    private final List<BigInteger> primes = Sieve.primeList(LIMIT);
 
     private final BigInteger maxPrime = primes.get(primes.size() - 1);
 

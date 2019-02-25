@@ -1,7 +1,5 @@
 plugins {
 	id 'java'
-	id 'eclipse' // optional (to generate Eclipse project files)
-	id 'idea' // optional (to generate IntelliJ IDEA project files)
 }
 
 repositories {
@@ -9,7 +7,8 @@ repositories {
 }
 
 dependencies {
-	testImplementation('org.junit.jupiter:junit-jupiter:5.4.0')
+        implementation 'org.bouncycastle:bcprov-jdk15on:1.61'
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.4.0'
 }
 
 test {

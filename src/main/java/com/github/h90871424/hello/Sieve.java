@@ -1,8 +1,17 @@
 package com.github.h90871424.hello;
 
+import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
-class Sieve {
+public class Sieve {
+
+    public static List<BigInteger> primeList(int max) {
+        return Arrays.stream(Sieve.create(max + 2))
+                .mapToObj(BigInteger::valueOf)
+                .collect(Collectors.toList());
+    }
 
     static int[] create(int max) {
         boolean[] prime = new boolean[max + 1];
@@ -10,7 +19,7 @@ class Sieve {
         long stop = Math.round(Math.sqrt(max));
         for (int n = 2; n <= stop; n++) {
             if (prime[n]) {
-                for (int i = 2 * n; i <= max; i += n) {
+                for (int i = n * n; i <= max; i += n) {
                     prime[i] = false;
                 }
             }

@@ -24,4 +24,10 @@ class SieveTest {
         int[] ints = Sieve.create((Integer.MAX_VALUE - 10) / 2);
         System.out.println(ints.length);
     }
+
+    @Test
+    void asdf() {
+        System.out.println(BigInteger.valueOf(1416 - 311).gcd(BigInteger.valueOf(2041)));
+        System.out.println(BigInteger.valueOf(1416 + 311).gcd(BigInteger.valueOf(2041)));
+    }
 }

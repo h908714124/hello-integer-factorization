@@ -1,6 +1,6 @@
 package com.github.h90871424.hello;
 
-import com.gazman.factor.QuadraticThieve;
+import com.github.h90871424.lenstra.FactorFinder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -38,13 +38,20 @@ class FactorsTest {
         }
     }
 
+    @Test
+    void testProblem() {
+        BigInteger problem = new BigInteger("4203852214522105994074156592890477");
+        BigInteger solution = FactorFinder.findFactor(problem);
+        System.out.printf("%s%n", solution);
+    }
+
     private List<BigInteger> solveRemaining(Factors f, List<BigInteger> factors) {
         Optional<BigInteger> opt = f.getProblem(factors);
         if (!opt.isPresent()) {
             return factors;
         }
         BigInteger problem = opt.get();
-        BigInteger solution = new QuadraticThieve(problem).start();
+        BigInteger solution = FactorFinder.findFactor(problem);
         List<BigInteger> result = new ArrayList<>();
         for (int i = 0; i < factors.size() - 1; i++) {
             BigInteger factor = factors.get(i);
@@ -70,7 +77,7 @@ class FactorsTest {
     @Test
     void testBiggie() {
         BigInteger problem = new BigInteger("341233306557836423189042926585457900151074303303755301");
-        BigInteger solution = new QuadraticThieve(problem).start();
+        BigInteger solution = FactorFinder.findFactor(problem);
         Assertions.assertNotEquals(problem, solution);
         Assertions.assertNotEquals(BigInteger.ONE, solution);
         Assertions.assertEquals(BigInteger.ZERO, problem.mod(solution));
