@@ -7,7 +7,7 @@ repositories {
 }
 
 dependencies {
-        implementation 'org.bouncycastle:bcprov-jdk15on:1.61'
+        implementation 'org.bouncycastle:bcprov-debug-jdk15on:1.61'
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.4.0'
 }
 
