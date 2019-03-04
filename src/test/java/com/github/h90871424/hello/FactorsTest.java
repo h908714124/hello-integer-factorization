@@ -1,5 +1,6 @@
 package com.github.h90871424.hello;
 
+import com.github.h90871424.lenstra.EllipticCurve;
 import com.github.h90871424.lenstra.FactorFinder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -8,12 +9,30 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class FactorsTest {
 
     private static final BigInteger NINE = BigInteger.valueOf(9);
+
+    private static final BigInteger FOUR = BigInteger.valueOf(4);
+    private static final BigInteger THREE = BigInteger.valueOf(3);
+    private static final BigInteger TWENTY_SEVEN = BigInteger.valueOf(27);
+
+    private static final BigInteger N = new BigInteger("92556179448994367391887834053878562534782033760810527051075248738484727059555245899601591");
+
+    @Test
+    void problematic() {
+        String ones = "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111";
+        assertEquals(97, ones.length());
+        assertEquals(
+                new BigInteger(ones),
+                N.multiply(BigInteger.valueOf(12004721)));
+        assertFalse(N.isProbablePrime(10));
+    }
 
     @Test
     void factors() {
@@ -80,7 +99,23 @@ class FactorsTest {
         BigInteger solution = FactorFinder.findFactor(problem);
         Assertions.assertNotEquals(problem, solution);
         Assertions.assertNotEquals(BigInteger.ONE, solution);
-        Assertions.assertEquals(BigInteger.ZERO, problem.mod(solution));
+        assertEquals(BigInteger.ZERO, problem.mod(solution));
+    }
+
+    static EllipticCurve randomCurve() {
+        long a;
+        long b;
+        do {
+            a = ThreadLocalRandom.current().nextLong();
+            b = ThreadLocalRandom.current().nextLong();
+        } while (!isEllipticCurve(BigInteger.valueOf(a), BigInteger.valueOf(b)));
+        return new EllipticCurve(N, BigInteger.valueOf(a), BigInteger.valueOf(b));
+    }
+
+    private static boolean isEllipticCurve(BigInteger a, BigInteger b) {
+        BigInteger aSummand = a.modPow(THREE, N).multiply(FOUR);
+        BigInteger bSummand = b.modPow(BigInteger.valueOf(2), N).multiply(TWENTY_SEVEN);
+        return !aSummand.add(bSummand).mod(N).equals(BigInteger.ZERO);
     }
 
     private static BigInteger product(List<BigInteger> factors) {
