@@ -45,18 +45,22 @@ public class TonelliShanks {
     }
 
 
-    public static XSolution findPoint(BigInteger n, BigInteger a, BigInteger b) {
+    public static Optional<XSolution> findPoint(BigInteger n, BigInteger a, BigInteger b) {
         BigInteger x = ZERO;
         Solution solution;
         BigInteger rhs;
+        int count = 100;
         do {
             x = x.add(BigInteger.ONE);
             rhs = x.modPow(THREE, n).add(a.multiply(x)).add(b).mod(n);
             solution = ts(rhs);
         }
-        while (!solution.exists);
+        while (count-- > 0 && !solution.exists);
+        if (!solution.exists) {
+            return Optional.empty();
+        }
         checkSolution(n, x, solution.root, a, b);
-        return new XSolution(x, solution.root);
+        return Optional.of(new XSolution(x, solution.root));
     }
 
     private static void checkSolution(BigInteger n, BigInteger x, BigInteger y, BigInteger a, BigInteger b) {

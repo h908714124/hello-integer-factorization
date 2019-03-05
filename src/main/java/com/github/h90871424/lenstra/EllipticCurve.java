@@ -13,7 +13,7 @@ public class EllipticCurve {
     private static final BigInteger THREE = BigInteger.valueOf(3);
     private static final BigInteger FOUR = BigInteger.valueOf(4);
     private static final BigInteger TWENTY_SEVEN = BigInteger.valueOf(27);
-    private static final int IMAX = Integer.MAX_VALUE / 100000000;
+    private static final int IMAX = Integer.MAX_VALUE / 1000;
     private static final BigInteger INT_MAX = BigInteger.valueOf(IMAX);
 
     private final BigInteger n;
