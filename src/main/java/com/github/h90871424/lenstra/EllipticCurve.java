@@ -1,14 +1,20 @@
 package com.github.h90871424.lenstra;
 
-import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.math.ec.WNafPreCompInfo;
 import org.bouncycastle.math.ec.WNafUtil;
 import org.bouncycastle.math.raw.Nat;
 
 import java.math.BigInteger;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class EllipticCurve {
+
+    private static final BigInteger THREE = BigInteger.valueOf(3);
+    private static final BigInteger FOUR = BigInteger.valueOf(4);
+    private static final BigInteger TWENTY_SEVEN = BigInteger.valueOf(27);
+    private static final int IMAX = Integer.MAX_VALUE / 100000000;
+    private static final BigInteger INT_MAX = BigInteger.valueOf(IMAX);
 
     private final BigInteger n;
 
@@ -18,18 +24,40 @@ public class EllipticCurve {
 
     private final BigInteger b;
 
-    private final ECCurve.Fp curve;
+//    private final ECCurve.Fp curve;
 
-    private final ECPoint p;
-
-    public EllipticCurve(BigInteger n, BigInteger a, BigInteger b) {
+    private EllipticCurve(
+            BigInteger n,
+            BigInteger a,
+            BigInteger b) {
         this.n = n;
-        this.a = a;
-        this.b = b;
+        this.a = a.mod(n);
+        this.b = b.mod(n);
         this.bits = n.bitLength();
-        this.curve = new ECCurve.Fp(n, a.mod(n), b.mod(n), null, null);
-        this.p = curve.validatePoint(BigInteger.valueOf(1), BigInteger.valueOf(1));
     }
+
+    public static EllipticCurve randomCurve(BigInteger n) {
+        int a;
+        int b;
+        do {
+            if (n.compareTo(INT_MAX) < 0) {
+                int uBound = Math.toIntExact(n.longValueExact());
+                a = ThreadLocalRandom.current().nextInt(0, uBound);
+                b = ThreadLocalRandom.current().nextInt(0, uBound);
+            } else {
+                a = ThreadLocalRandom.current().nextInt(0, IMAX);
+                b = ThreadLocalRandom.current().nextInt(0, IMAX);
+            }
+        } while (!isEllipticCurve(n, BigInteger.valueOf(a), BigInteger.valueOf(b)));
+        return new EllipticCurve(n, BigInteger.valueOf(a), BigInteger.valueOf(b));
+    }
+
+    private static boolean isEllipticCurve(BigInteger n, BigInteger a, BigInteger b) {
+        BigInteger aSummand = a.modPow(THREE, n).multiply(FOUR);
+        BigInteger bSummand = b.modPow(BigInteger.valueOf(2), n).multiply(TWENTY_SEVEN);
+        return !aSummand.add(bSummand).mod(n).equals(BigInteger.ZERO);
+    }
+
 
     /**
      * AbstractECMultiplier
@@ -47,7 +75,7 @@ public class EllipticCurve {
          * Although the various multipliers ought not to produce invalid output under normal
          * circumstances, a final check here is advised to guard against fault attacks.
          */
-        return p;
+        return result;
     }
 
 
@@ -130,13 +158,14 @@ public class EllipticCurve {
         return WNafUtil.getWindowSize(bits);
     }
 
-
-    public ECPoint getPoint() {
-        return p;
-    }
-
     public void check(ECPoint newPoint) {
-        modInverse(newPoint.getZCoord(0).toBigInteger());
+        BigInteger z = newPoint.getZCoord(0).toBigInteger();
+        try {
+            modInverse(z);
+        } catch (Exception e) {
+            System.err.println("Divisor found: " + n.gcd(z));
+            throw e;
+        }
     }
 
     private BigInteger modInverse(BigInteger x) {
@@ -247,7 +276,9 @@ public class EllipticCurve {
         int count = u.length;
         while (u[0] == 0) {
             count--;
-            assert count > 0 : "zero input";
+            if (count == 0) {
+                throw new IllegalArgumentException("zero");
+            }
             shiftDownWord(uLen, u, 0);
         }
         return 32 * (u.length - count);
@@ -276,4 +307,11 @@ public class EllipticCurve {
         return count;
     }
 
+    public BigInteger getA() {
+        return a;
+    }
+
+    public BigInteger getB() {
+        return b;
+    }
 }
