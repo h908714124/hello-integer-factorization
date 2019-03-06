@@ -15,24 +15,29 @@ class BigTest {
 
     @Test
     void test() {
-        for (int j = 0; j < 100; j++) {
+        for (long j = 0; j < 100000000; j++) {
+            boolean print = j % 16777216 == 0;
+            if (print) {
+                System.out.printf("j=%d%n", j);
+            }
             EllipticCurve curve = EllipticCurve.randomCurve(n);
-            ECCurve ecCurve = new ECCurve.Fp(n, curve.getA(), curve.getB(), null, null);
-            System.out.printf("Testing curve %d, n=%s, a=%s, b=%s%n", j, n, curve.getA(), curve.getB());
             Optional<TonelliShanks.XSolution> solution = TonelliShanks.findPoint(n, curve.getA(), curve.getB());
             if (!solution.isPresent()) {
-                System.out.println("no solution");
+                if (print) {
+                    System.out.println("no solution");
+                }
                 continue;
             }
-            System.out.printf("Solution: x=%s, y=%s%n", solution.get().getX(), solution.get().getY());
+            ECCurve ecCurve = new ECCurve.Fp(n, curve.getA(), curve.getB(), null, null);
+            System.err.printf("Solution: x=%s, y=%s%n", solution.get().getX(), solution.get().getY());
             ECPoint p = ecCurve.validatePoint(solution.get().getX(), solution.get().getY());
-            System.out.println("Testing curve " + j + ", point: " + p);
+            System.err.printf("Testing curve %d, a=%s, b=%s, point: (%s, %s)%n", j, curve.getA(), curve.getB(), solution.get().getX(), solution.get().getY());
 
-            for (int i = 2; i < 100; i++) {
+            for (int i = 2; i < 100000; i++) {
                 p = curve.multiply(p, BigInteger.valueOf(i));
                 curve.check(p);
             }
-            System.out.println("Curve " + j + " done");
+            System.err.println("Curve " + j + " done");
         }
     }
 }

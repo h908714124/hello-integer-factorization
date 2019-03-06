@@ -13,7 +13,7 @@ public class EllipticCurve {
     private static final BigInteger THREE = BigInteger.valueOf(3);
     private static final BigInteger FOUR = BigInteger.valueOf(4);
     private static final BigInteger TWENTY_SEVEN = BigInteger.valueOf(27);
-    private static final int IMAX = Integer.MAX_VALUE / 1000;
+    private static final int IMAX = Integer.MAX_VALUE / 50;
     private static final BigInteger INT_MAX = BigInteger.valueOf(IMAX);
 
     private final BigInteger n;
@@ -37,19 +37,13 @@ public class EllipticCurve {
     }
 
     public static EllipticCurve randomCurve(BigInteger n) {
-        int a;
-        int b;
+        BigInteger a;
+        BigInteger b;
         do {
-            if (n.compareTo(INT_MAX) < 0) {
-                int uBound = Math.toIntExact(n.longValueExact());
-                a = ThreadLocalRandom.current().nextInt(0, uBound);
-                b = ThreadLocalRandom.current().nextInt(0, uBound);
-            } else {
-                a = ThreadLocalRandom.current().nextInt(0, IMAX);
-                b = ThreadLocalRandom.current().nextInt(0, IMAX);
-            }
-        } while (!isEllipticCurve(n, BigInteger.valueOf(a), BigInteger.valueOf(b)));
-        return new EllipticCurve(n, BigInteger.valueOf(a), BigInteger.valueOf(b));
+            a = new BigInteger(40, ThreadLocalRandom.current()).mod(n);
+            b = new BigInteger(40, ThreadLocalRandom.current()).mod(n);
+        } while (!isEllipticCurve(n, a, b));
+        return new EllipticCurve(n, a, b);
     }
 
     private static boolean isEllipticCurve(BigInteger n, BigInteger a, BigInteger b) {
