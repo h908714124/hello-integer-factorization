@@ -40,8 +40,8 @@ public class EllipticCurve {
         BigInteger a;
         BigInteger b;
         do {
-            a = new BigInteger(40, ThreadLocalRandom.current()).mod(n);
-            b = new BigInteger(40, ThreadLocalRandom.current()).mod(n);
+            a = new BigInteger(30, ThreadLocalRandom.current()).mod(n);
+            b = new BigInteger(30, ThreadLocalRandom.current()).mod(n);
         } while (!isEllipticCurve(n, a, b));
         return new EllipticCurve(n, a, b);
     }

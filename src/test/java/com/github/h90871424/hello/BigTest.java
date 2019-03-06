@@ -33,7 +33,7 @@ class BigTest {
             ECPoint p = ecCurve.validatePoint(solution.get().getX(), solution.get().getY());
             System.err.printf("Testing curve %d, a=%s, b=%s, point: (%s, %s)%n", j, curve.getA(), curve.getB(), solution.get().getX(), solution.get().getY());
 
-            for (int i = 2; i < 100000; i++) {
+            for (int i = 2; i < 200; i++) {
                 p = curve.multiply(p, BigInteger.valueOf(i));
                 curve.check(p);
             }
