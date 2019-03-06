@@ -2,6 +2,7 @@ package com.github.h90871424.lenstra;
 
 import java.math.BigInteger;
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static java.math.BigInteger.ZERO;
 
@@ -46,7 +47,7 @@ public class TonelliShanks {
 
 
     public static Optional<XYSolution> findPoint(BigInteger n, BigInteger a, BigInteger b) {
-        BigInteger x = ZERO;
+        BigInteger x = new BigInteger(10, ThreadLocalRandom.current());
         Solution solution;
         BigInteger rhs;
         int count = 100;

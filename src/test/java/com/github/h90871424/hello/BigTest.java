@@ -16,7 +16,7 @@ class BigTest {
     @Test
     void test() {
         int curveCounter = 0;
-        for (long j = 0; j < 100000000; j++) {
+        for (long j = 0; j < 1000000000; j++) {
             boolean print = j % 16777216 == 0;
             if (print) {
                 System.out.printf("j=%d%n", j);
