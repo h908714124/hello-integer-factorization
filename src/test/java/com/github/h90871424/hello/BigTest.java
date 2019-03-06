@@ -15,13 +15,14 @@ class BigTest {
 
     @Test
     void test() {
+        int curveCounter = 0;
         for (long j = 0; j < 100000000; j++) {
             boolean print = j % 16777216 == 0;
             if (print) {
                 System.out.printf("j=%d%n", j);
             }
             EllipticCurve curve = EllipticCurve.randomCurve(n);
-            Optional<TonelliShanks.XSolution> solution = TonelliShanks.findPoint(n, curve.getA(), curve.getB());
+            Optional<TonelliShanks.XYSolution> solution = TonelliShanks.findPoint(n, curve.getA(), curve.getB());
             if (!solution.isPresent()) {
                 if (print) {
                     System.out.println("no solution");
@@ -29,15 +30,24 @@ class BigTest {
                 continue;
             }
             ECCurve ecCurve = new ECCurve.Fp(n, curve.getA(), curve.getB(), null, null);
-            System.err.printf("Solution: x=%s, y=%s%n", solution.get().getX(), solution.get().getY());
+            boolean print2 = curveCounter % 128 == 0;
+            if (print2) {
+                System.err.printf("Solution: x=%s, y=%s%n", solution.get().getX(), solution.get().getY());
+            }
             ECPoint p = ecCurve.validatePoint(solution.get().getX(), solution.get().getY());
-            System.err.printf("Testing curve %d, a=%s, b=%s, point: (%s, %s)%n", j, curve.getA(), curve.getB(), solution.get().getX(), solution.get().getY());
+            if (print2) {
+                System.err.printf("Testing curve %d, a=%s, b=%s, point=(%s, %s)%n",
+                        curveCounter, curve.getA(), curve.getB(), solution.get().getX(), solution.get().getY());
+            }
 
             for (int i = 2; i < 200; i++) {
                 p = curve.multiply(p, BigInteger.valueOf(i));
                 curve.check(p);
             }
-            System.err.println("Curve " + j + " done");
+            if (print2) {
+                System.err.printf("Curve %d done%n", curveCounter);
+            }
+            curveCounter++;
         }
     }
 }

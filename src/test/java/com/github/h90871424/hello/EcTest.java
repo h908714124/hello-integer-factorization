@@ -19,7 +19,7 @@ class EcTest {
             EllipticCurve curve = EllipticCurve.randomCurve(n);
             ECCurve ecCurve = new ECCurve.Fp(n, curve.getA(), curve.getB(), null, null);
 
-            Optional<TonelliShanks.XSolution> solution = TonelliShanks.findPoint(n, curve.getA(), curve.getB());
+            Optional<TonelliShanks.XYSolution> solution = TonelliShanks.findPoint(n, curve.getA(), curve.getB());
             if (!solution.isPresent()) {
                 continue;
             }

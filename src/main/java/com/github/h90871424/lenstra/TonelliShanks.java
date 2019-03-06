@@ -25,12 +25,12 @@ public class TonelliShanks {
     }
 
 
-    public static class XSolution {
+    public static class XYSolution {
 
         private final BigInteger x;
         private final BigInteger y;
 
-        XSolution(BigInteger x, BigInteger y) {
+        XYSolution(BigInteger x, BigInteger y) {
             this.x = x;
             this.y = y;
         }
@@ -45,7 +45,7 @@ public class TonelliShanks {
     }
 
 
-    public static Optional<XSolution> findPoint(BigInteger n, BigInteger a, BigInteger b) {
+    public static Optional<XYSolution> findPoint(BigInteger n, BigInteger a, BigInteger b) {
         BigInteger x = ZERO;
         Solution solution;
         BigInteger rhs;
@@ -60,7 +60,7 @@ public class TonelliShanks {
             return Optional.empty();
         }
         checkSolution(n, x, solution.root, a, b);
-        return Optional.of(new XSolution(x, solution.root));
+        return Optional.of(new XYSolution(x, solution.root));
     }
 
     private static void checkSolution(BigInteger n, BigInteger x, BigInteger y, BigInteger a, BigInteger b) {
