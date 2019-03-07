@@ -61,7 +61,8 @@ public class TonelliShanks {
             return Optional.empty();
         }
         checkSolution(n, x, solution.root, a, b);
-        return Optional.of(new XYSolution(x, solution.root));
+        XYSolution result = new XYSolution(x, solution.root);
+        return Optional.of(result);
     }
 
     private static void checkSolution(BigInteger n, BigInteger x, BigInteger y, BigInteger a, BigInteger b) {
