@@ -20,7 +20,7 @@ class BigTest {
     @Test
     void test() throws IOException {
         long curveCounter = 0;
-        try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("curves.txt")))) {
+        try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("curves.txt", true)))) {
             for (long j = 0; j < 2147483500; j++) {
                 boolean print = j % 16777216 == 0;
                 if (print) {
