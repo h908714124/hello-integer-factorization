@@ -76,5 +76,6 @@ class PollardRho {
                 }
             }
         }
+        pool.shutdownNow();
     }
 }
