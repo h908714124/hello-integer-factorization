@@ -19,7 +19,7 @@ class PollardRho {
     // factor in 999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
     private static final BigInteger N = new BigInteger("92556179448994367391887834053878562534782033760810527051075248738484727059555245899601591");
 
-    private static BigInteger rho(BigInteger N) {
+    private static Optional<BigInteger> rho(BigInteger N) {
         BigInteger divisor;
         BigInteger x = new BigInteger(N.bitLength(), new SecureRandom());
         BigInteger y = x;
@@ -40,22 +40,8 @@ class PollardRho {
             }
         } while (_count < 100 && divisor.equals(ONE));
 
-        return divisor;
+        return divisor.equals(ONE) ? Optional.empty() : Optional.of(divisor);
     }
-
-    private static Optional<BigInteger> factor(BigInteger N) {
-        if (N.equals(ONE)) {
-            return Optional.empty();
-        }
-        if (N.isProbablePrime(20)) {
-            return Optional.of(N);
-        }
-        BigInteger divisor = rho(N);
-        factor(divisor);
-        factor(N.divide(divisor));
-        return Optional.empty();
-    }
-
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
         int threads = Arrays.stream(args).mapToInt(Integer::parseInt).findFirst().orElse(3);
@@ -70,12 +56,13 @@ class PollardRho {
                 String threadName = "T" + i;
                 futures.add(pool.submit(() -> {
                     Thread.currentThread().setName(threadName);
-                    return factor(N);
+                    return rho(N);
                 }));
             }
             for (Future<Optional<BigInteger>> future : futures) {
                 Optional<BigInteger> result = future.get();
                 if (result.isPresent()) {
+                    pool.shutdownNow();
                     // party mode
                     System.out.println();
                     System.out.println("##### A FACTOR WAS FOUND #####");
