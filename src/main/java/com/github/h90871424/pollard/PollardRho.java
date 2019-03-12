@@ -11,42 +11,33 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import static java.math.BigInteger.ONE;
-import static java.math.BigInteger.ZERO;
 
 
 class PollardRho {
-    private final static BigInteger TWO = new BigInteger("2");
-    private final static SecureRandom random = new SecureRandom();
+
+    // factor in 999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+    private static final BigInteger N = new BigInteger("92556179448994367391887834053878562534782033760810527051075248738484727059555245899601591");
 
     private static BigInteger rho(BigInteger N) {
         BigInteger divisor;
-        BigInteger c = new BigInteger(N.bitLength(), random);
-        BigInteger x = new BigInteger(N.bitLength(), random);
-        BigInteger xx = x;
+        BigInteger x = new BigInteger(N.bitLength(), new SecureRandom());
+        BigInteger y = x;
 
-        // check divisibility by 2
-        if (N.mod(TWO).equals(ZERO)) {
-            return TWO;
-        }
-
-        long count = 0;
-        int innerCount = 0;
+        int __count = 0, _count = 0;
 
         do {
-            x = x.multiply(x).mod(N).add(c).mod(N);
-            xx = xx.multiply(xx).mod(N).add(c).mod(N);
-            xx = xx.multiply(xx).mod(N).add(c).mod(N);
-            divisor = x.subtract(xx).gcd(N);
-            if (count++ % 1048576 == 0) {
-                innerCount++;
+            x = x.multiply(x).subtract(ONE).mod(N);
+            y = y.multiply(y).subtract(ONE).mod(N);
+            y = y.multiply(y).subtract(ONE).mod(N);
+            divisor = x.subtract(y).gcd(N);
+            if (__count++ == 1048576) {
+                __count = 0;
                 System.out.printf(
                         "%s %d %s %s%n",
                         Thread.currentThread().getName(),
-                        innerCount,
-                        x,
-                        xx);
+                        _count++, x, y);
             }
-        } while (innerCount < 100 && divisor.equals(ONE));
+        } while (_count < 100 && divisor.equals(ONE));
 
         return divisor;
     }
@@ -66,7 +57,9 @@ class PollardRho {
 
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
-        BigInteger N = new BigInteger("92556179448994367391887834053878562534782033760810527051075248738484727059555245899601591");
+        if (N.isProbablePrime(10)) {
+            throw new IllegalStateException("could be prime");
+        }
         ExecutorService pool = Executors.newFixedThreadPool(3);
         for (int i = 0; i < 100; i++) {
             List<Future<Optional<BigInteger>>> futures = new ArrayList<>(4);
@@ -85,8 +78,13 @@ class PollardRho {
             for (Future<Optional<BigInteger>> future : futures) {
                 Optional<BigInteger> result = future.get();
                 if (result.isPresent()) {
+                    // party mode
+                    System.out.println();
+                    System.out.println("##### A FACTOR WAS FOUND #####");
                     System.out.println(result.get());
                     System.err.println(result.get());
+                    System.out.println(result.get());
+                    System.out.println("##### A FACTOR WAS FOUND #####");
                     System.out.flush();
                     System.err.flush();
                     return;
