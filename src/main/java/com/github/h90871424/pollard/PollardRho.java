@@ -3,6 +3,7 @@ package com.github.h90871424.pollard;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -57,24 +58,21 @@ class PollardRho {
 
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
+        int threads = Arrays.stream(args).mapToInt(Integer::parseInt).findFirst().orElse(3);
         if (N.isProbablePrime(10)) {
             throw new IllegalStateException("could be prime");
         }
-        ExecutorService pool = Executors.newFixedThreadPool(3);
+        System.out.printf("using %d threads%n", threads);
+        ExecutorService pool = Executors.newFixedThreadPool(threads);
         for (int i = 0; i < 100; i++) {
-            List<Future<Optional<BigInteger>>> futures = new ArrayList<>(4);
-            futures.add(pool.submit(() -> {
-                Thread.currentThread().setName("T1");
-                return factor(N);
-            }));
-            futures.add(pool.submit(() -> {
-                Thread.currentThread().setName("T2");
-                return factor(N);
-            }));
-            futures.add(pool.submit(() -> {
-                Thread.currentThread().setName("T3");
-                return factor(N);
-            }));
+            List<Future<Optional<BigInteger>>> futures = new ArrayList<>(threads);
+            for (int j = 0; j < threads; j++) {
+                String threadName = "T" + i;
+                futures.add(pool.submit(() -> {
+                    Thread.currentThread().setName(threadName);
+                    return factor(N);
+                }));
+            }
             for (Future<Optional<BigInteger>> future : futures) {
                 Optional<BigInteger> result = future.get();
                 if (result.isPresent()) {
