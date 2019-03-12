@@ -19,7 +19,7 @@ class PollardRho {
     // factor in 999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
     private static final BigInteger N = new BigInteger("92556179448994367391887834053878562534782033760810527051075248738484727059555245899601591");
 
-    private static Optional<BigInteger> rho(BigInteger N) {
+    private static Optional<BigInteger> rho() {
         BigInteger divisor;
         BigInteger x = new BigInteger(N.bitLength(), new SecureRandom());
         BigInteger y = x;
@@ -56,7 +56,7 @@ class PollardRho {
                 String threadName = "T" + i;
                 futures.add(pool.submit(() -> {
                     Thread.currentThread().setName(threadName);
-                    return rho(N);
+                    return rho();
                 }));
             }
             for (Future<Optional<BigInteger>> future : futures) {
