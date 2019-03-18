@@ -20,6 +20,11 @@ class FactorsTest {
     private static final BigInteger N = new BigInteger("92556179448994367391887834053878562534782033760810527051075248738484727059555245899601591");
 
     @Test
+    void testSolution() {
+        assertEquals(BigInteger.ZERO, N.divideAndRemainder(new BigInteger("846035731396919233767211537899097169"))[1]);
+    }
+
+    @Test
     void problematic() {
         String ones = "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111";
         assertEquals(97, ones.length());

@@ -27,9 +27,9 @@ class PollardRho {
         int __count = 0, _count = 0;
 
         do {
-            x = x.multiply(x).subtract(ONE).mod(N);
-            y = y.multiply(y).subtract(ONE).mod(N);
-            y = y.multiply(y).subtract(ONE).mod(N);
+            x = x.multiply(x).add(ONE).mod(N);
+            y = y.multiply(y).add(ONE).mod(N);
+            y = y.multiply(y).add(ONE).mod(N);
             divisor = x.subtract(y).gcd(N);
             if (__count++ == 1048576) {
                 __count = 0;
