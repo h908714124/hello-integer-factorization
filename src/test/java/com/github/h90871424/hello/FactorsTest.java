@@ -5,9 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.math.BigInteger.ONE;
@@ -16,9 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class FactorsTest {
-
-    private static final BigInteger NINE = BigInteger.valueOf(9);
-
 
     private static final BigInteger N = new BigInteger("92556179448994367391887834053878562534782033760810527051075248738484727059555245899601591");
 
@@ -69,23 +64,6 @@ class FactorsTest {
         System.out.printf("%s%n", solution);
     }
 
-    private List<BigInteger> solveRemaining(Factors f, List<BigInteger> factors) {
-        Optional<BigInteger> opt = f.getProblem(factors);
-        if (!opt.isPresent()) {
-            return factors;
-        }
-        BigInteger problem = opt.get();
-        BigInteger solution = FactorFinder.findFactor(problem);
-        List<BigInteger> result = new ArrayList<>();
-        for (int i = 0; i < factors.size() - 1; i++) {
-            BigInteger factor = factors.get(i);
-            result.add(factor);
-        }
-        result.add(solution);
-        result.add(problem.divide(solution));
-        return result;
-    }
-
     @Test
     void testBla() {
         Factors f = new Factors();
@@ -108,7 +86,7 @@ class FactorsTest {
     }
 
 
-    private static BigInteger product(List<BigInteger> factors) {
+    static BigInteger product(List<BigInteger> factors) {
         BigInteger result = ONE;
         for (BigInteger factor : factors) {
             result = result.multiply(factor);
