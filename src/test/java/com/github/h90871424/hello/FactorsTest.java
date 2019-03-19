@@ -8,7 +8,10 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.TEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -44,16 +47,18 @@ class FactorsTest {
     @Test
     void testGermanSequence() {
         Factors f = new Factors();
-        BigInteger start = NINE;
         for (int i = 1; i < 100; i++) {
+            BigInteger start = TEN.pow(i).subtract(ONE);
             List<BigInteger> factors = f.factors(start);
-            factors = solveRemaining(f, factors);
             assertEquals(start, product(factors));
+            boolean hasProblem = false;
             for (BigInteger factor : factors) {
-                Assertions.assertTrue(factor.isProbablePrime(10));
+                boolean probablePrime = factor.isProbablePrime(50);
+                if (!probablePrime) {
+                    hasProblem = true;
+                }
             }
-            System.out.printf("%d -> %s%n", start, factors);
-            start = start.add(NINE.multiply(BigInteger.TEN.pow(i)));
+            System.out.printf("%d | %s%s%n", i, factors.stream().map(BigInteger::toString).collect(Collectors.joining(", ")), hasProblem ? "*" : "");
         }
     }
 
@@ -98,13 +103,13 @@ class FactorsTest {
         BigInteger problem = new BigInteger("341233306557836423189042926585457900151074303303755301");
         BigInteger solution = FactorFinder.findFactor(problem);
         Assertions.assertNotEquals(problem, solution);
-        Assertions.assertNotEquals(BigInteger.ONE, solution);
+        Assertions.assertNotEquals(ONE, solution);
         assertEquals(BigInteger.ZERO, problem.mod(solution));
     }
 
 
     private static BigInteger product(List<BigInteger> factors) {
-        BigInteger result = BigInteger.ONE;
+        BigInteger result = ONE;
         for (BigInteger factor : factors) {
             result = result.multiply(factor);
         }
