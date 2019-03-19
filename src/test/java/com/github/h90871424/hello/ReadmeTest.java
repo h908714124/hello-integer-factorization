@@ -1,5 +1,7 @@
 package com.github.h90871424.hello;
 
+import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -7,14 +9,23 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReadmeTest {
+import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.TEN;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    public static void main(String[] args) throws IOException {
+class ReadmeTest {
+
+    @Test
+    void test() throws IOException {
         List<String> lines = Files.readAllLines(Paths.get("README.md"));
-        int i = lines.indexOf("--- | ---");
-        for (String line : lines.subList(i + 1, lines.size())) {
+        List<String> subList = lines.subList(lines.indexOf("--- | ---") + 1, lines.size());
+        assertEquals(99, subList.size());
+        for (int i = 0; i < subList.size(); i++) {
+            String line = subList.get(i);
             List<BigInteger> split = getTokens(line);
-            System.out.println(FactorsTest.product(split));
+            BigInteger product = FactorsTest.product(split);
+            assertEquals(TEN.pow(i + 1).subtract(ONE), product);
+            System.out.println(product);
         }
     }
 
@@ -22,12 +33,8 @@ public class ReadmeTest {
         String[] tokens = line.split("[|]", 2);
         tokens = tokens[1].split("[,]", -1);
         List<BigInteger> result = new ArrayList<>(tokens.length);
-        for (int i = 0; i < tokens.length; i++) {
-            String token = tokens[i];
-
-            if (token.endsWith("*")) {
-                token = token.substring(0, token.length() - 1);
-            }
+        for (String token : tokens) {
+            token = token.replace("*", "");
             result.add(new BigInteger(token.trim()));
         }
         return result;
