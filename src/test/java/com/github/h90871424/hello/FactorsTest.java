@@ -42,7 +42,7 @@ class FactorsTest {
     @Test
     void testGermanSequence() {
         Factors f = new Factors();
-        for (int i = 1; i < 100; i++) {
+        for (int i = 100; i <= 110; i++) {
             BigInteger start = TEN.pow(i).subtract(ONE);
             List<BigInteger> factors = f.factors(start);
             assertEquals(start, product(factors));

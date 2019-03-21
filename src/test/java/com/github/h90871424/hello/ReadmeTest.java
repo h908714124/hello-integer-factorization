@@ -20,8 +20,8 @@ class ReadmeTest {
     @Test
     void test() throws IOException {
         List<String> lines = Files.readAllLines(Paths.get("README.md"));
-        List<String> subList = lines.subList(lines.indexOf("--- | ---") + 1, lines.size());
-        assertEquals(99, subList.size());
+        int index = lines.indexOf("--- | ---") + 1;
+        List<String> subList = lines.subList(index, index + 110);
         Set<BigInteger> alle = new TreeSet<>();
         for (int i = 0; i < subList.size(); i++) {
             String line = subList.get(i);
