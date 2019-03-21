@@ -8,6 +8,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.TEN;
@@ -20,12 +22,17 @@ class ReadmeTest {
         List<String> lines = Files.readAllLines(Paths.get("README.md"));
         List<String> subList = lines.subList(lines.indexOf("--- | ---") + 1, lines.size());
         assertEquals(99, subList.size());
+        Set<BigInteger> alle = new TreeSet<>();
         for (int i = 0; i < subList.size(); i++) {
             String line = subList.get(i);
             List<BigInteger> split = getTokens(line);
+            alle.addAll(split);
             BigInteger product = FactorsTest.product(split);
             assertEquals(TEN.pow(i + 1).subtract(ONE), product);
             System.out.println(product);
+        }
+        for (BigInteger bigInteger : alle) {
+            System.out.println(bigInteger);
         }
     }
 
